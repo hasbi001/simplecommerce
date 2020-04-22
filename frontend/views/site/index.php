@@ -14,6 +14,7 @@ $user = Yii::$app->user;
     .hide { display: none; }
 </style>
 <div class="site-index">
+    <span id="message"></span>
     <div class="row">
         <div class="col-md-6">
             <table>
@@ -21,20 +22,31 @@ $user = Yii::$app->user;
                     <tr>
                         <td><?php echo Html::img('@web/hp/'.$value->images) ?> <br> <?= $value->name ?></td>
                         <td><input type="number" name="quantity" id="hp<?= $value->id?>"></td>
-                        <td><a href="javascript:void(0)" class="btn btn-default" onclick="addToCart(<?= $value->id?>)">Add to Cart</a></td>
+                        <td><button class="btn btn-default" onclick="<?= new JsExpression('addToCart('.$value->id.')') ?>">Add to Cart</button></td>
                     </tr>
                 <?php } ?>
             </table>   
         </div>
         <div class="col-md-6">
             <label id="title-order"></label>
-            <table class="hide">
-                <tr>
-                    <td>Item</td>
-                    <td>Quantity</td>
-                    <td>Price</td>
-                    <td></td>
-                </tr>
+            <table class="hide" id="orderTable">
+                <thead>
+                    <tr>
+                        <td>Item</td>
+                        <td>Quantity</td>
+                        <td>Price</td>
+                        <td></td>
+                    </tr>
+                </thead>
+                <tbody>
+                    
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="3">Total</td>
+                        <td><span id="totalprice"></span></td>
+                    </tr>
+                </tfoot>
             </table>
         </div>
     </div> 
@@ -45,10 +57,16 @@ $user = Yii::$app->user;
             $.ajax({
                   type: 'GET',
                   url: '".Url::toRoute('site/add-cart')."',
-                  data: {id:id},
+                  data: {id:id,quantity:$('#hp'+id).val()},
                   success: function(result){
-
-                    },
+                    if(result.status == 200){
+                        $('#orderTable').css('display','block');
+                        var newRow=document.getElementById('orderTable').insertRow();
+                        newRow.innerHTML = '<td>'+result.name+'</td>'+'<td>'+result.quantity+'</td>'+'<td>'+result.price+'</td>'+'<td><a href=\'#\'>delete</a></td>';
+                        $('#totalprice').text(result.total);
+                    }
+                    $('#message').text(result.message);
+                  },
                   dataType: 'JSON'
             });   
         }

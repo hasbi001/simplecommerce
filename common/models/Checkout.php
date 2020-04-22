@@ -12,11 +12,12 @@ use Yii;
  * @property int $order_id
  * @property string|null $address
  * @property string $email
- * @property int $card_number
+ * @property string $card_number
  * @property int $exp_month
  * @property int $exp_year
  * @property int $cvc
  * @property string|null $time_created
+ * @property int|null $status
  *
  * @property Orders $order
  * @property User $user
@@ -38,10 +39,11 @@ class Checkout extends \yii\db\ActiveRecord
     {
         return [
             [['user_id', 'order_id', 'email', 'card_number', 'exp_month', 'exp_year', 'cvc'], 'required'],
-            [['user_id', 'order_id', 'card_number', 'exp_month', 'exp_year', 'cvc'], 'integer'],
+            [['user_id', 'order_id', 'exp_month', 'exp_year', 'cvc', 'status'], 'integer'],
             [['time_created'], 'safe'],
             [['address'], 'string', 'max' => 255],
             [['email'], 'string', 'max' => 60],
+            [['card_number'], 'string', 'max' => 25],
             [['order_id'], 'exist', 'skipOnError' => true, 'targetClass' => Orders::className(), 'targetAttribute' => ['order_id' => 'id']],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['user_id' => 'id']],
         ];
@@ -63,6 +65,7 @@ class Checkout extends \yii\db\ActiveRecord
             'exp_year' => 'Exp Year',
             'cvc' => 'Cvc',
             'time_created' => 'Time Created',
+            'status' => 'Status',
         ];
     }
 

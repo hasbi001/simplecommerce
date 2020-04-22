@@ -285,22 +285,28 @@ class SiteController extends Controller
         $model->quantity = $request['quantity'];
         $model->price = $request['quantity']*$item->price;
         if ($model->save()) {
-
+            $total = Orders::find()->asArray()->select([new \yii\db\Expression('SUM(price) AS total')])->where(['code' => $code])->one();
             $result = array(
                 'status'=>200,
                 'message'=>'success',
-                'data' => array('name'=>$item->name, 'quantity'=>$model->quantity,'price'=>$model->price)
+                'data' => array('id'=>$model->id,'name'=>$item->name, 'quantity'=>$model->quantity,'price'=>$model->price,'total'=> $total)
             );
         }
         else
         {
             $result = array(
                 'status'=>400,
-                'message'=>'success',
+                'message'=>'Somthing error. please try again',
                 'data' => array()
             );
         }
 
         return \yii\helpers\Json::encode($result);
+    }
+
+    public function actionListOrder()
+    {
+        $model = Checkout::find()->with('order')->where(['user_id'=>Yii::$app->user->id])->all();
+        return $this->render('listorder',['model'=>$model]);
     }
 }
